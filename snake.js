@@ -14,8 +14,12 @@ export default class Snake {
     this.direction = "e";
     this.speed = 100;
     this.score = 0;
+    this.gamepads = false;
+    this.gamepadState = {};
 
     this.addKeayboardEvent(this.direction);
+    this.connectgamePad();
+    this.disconnectGamepad();
 
     //Start game
     requestAnimationFrame(() => {
@@ -80,28 +84,75 @@ export default class Snake {
   }
 
   move() {
-    if (!this.updateSnakePosition(this.snake)) {
-      this.drawMap(this.ctx);
-      this.drawSnake(this.ctx, this.snake, this.gridSize);
-      this.drawApple(this.ctx, this.apple, this.gridSize);
-      this.drawScore();
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          this.move();
-        });
-      }, 3000 - this.speed);
-    } else {
-      alert("Game Over !");
-    }
+    this.gamePadUpdate();
+    requestAnimationFrame(() => {
+      this.move();
+    });
+
+    // if (!this.updateSnakePosition(this.snake)) {
+    //   this.drawMap(this.ctx);
+    //   this.drawSnake(this.ctx, this.snake, this.gridSize);
+    //   this.drawApple(this.ctx, this.apple, this.gridSize);
+    //   this.drawScore();
+    //   setTimeout(() => {
+    //     requestAnimationFrame(() => {
+    //       this.move();
+    //     });
+    //   }, 500 - this.speed);
+    // } else {
+    //   alert("Game Over !");
+    // }
   }
 
   //Gamepage
 
-  connectgamePad() {}
+  connectgamePad() {
+    window.addEventListener("gamepadconnected", (event) => {
+      console.log("gamePad Connected", event.gamepad);
+    });
+  }
 
-  disconnectGamepad() {}
+  disconnectGamepad() {
+    window.addEventListener("gamepaddisconnected", (event) => {
+      console.log("gamePad disconnected", event.gamepad);
+    });
+  }
 
-  gamePadUpdate() {}
+  gamePadUpdate() {
+    const textDisplay = document.querySelector(".returnInput");
+    const gamepads = navigator.getGamepads()[0];
+    if (gamepads) {
+      console.log(gamepads.buttons[0].pressed);
+
+      this.gamepadState = {
+        id: gamepads.id,
+        stick_left: [gamepads.axes[2].toFixed(2), gamepads.axes[3].toFixed(2)],
+        stick_right: [gamepads.axes[0].toFixed(2), gamepads.axes[1].toFixed(2)],
+        button: {
+          A: gamepads.buttons[0].pressed,
+          B: gamepads.buttons[1].pressed,
+          X: gamepads.buttons[2].pressed,
+          Y: gamepads.buttons[3].pressed,
+          L: gamepads.buttons[4].pressed,
+          R: gamepads.buttons[5].pressed,
+          ZL: gamepads.buttons[6].pressed,
+          ZR: gamepads.buttons[7].pressed,
+          start: gamepads.buttons[9].pressed,
+          stick_1: gamepads.buttons[10].pressed,
+          stick_2: gamepads.buttons[11].pressed,
+        },
+
+        cross: {
+          up: gamepads.buttons[12].pressed,
+          down: gamepads.buttons[13].pressed,
+          left: gamepads.buttons[14].pressed,
+          right: gamepads.buttons[15].pressed,
+        },
+      };
+    }
+
+    textDisplay.textContent = JSON.stringify(this.gamepadState, null, 2);
+  }
 
   // Draw element of game
 
