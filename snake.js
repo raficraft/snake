@@ -101,6 +101,8 @@ export default class Snake {
 
   disconnectGamepad() {}
 
+  gamePadUpdate() {}
+
   // Draw element of game
 
   updateSnakePosition(snake) {
