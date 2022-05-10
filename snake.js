@@ -23,6 +23,28 @@ export default class Snake {
     });
   }
 
+  gameOver() {
+    if (
+      this.snake[0][0] > 19 ||
+      this.snake[0][0] < 0 ||
+      this.snake[0][1] > 19 ||
+      this.snake[0][1] < 0
+    ) {
+      return true;
+    } else {
+      const [head, ...body] = this.snake;
+
+      //if head colision body
+      for (let bodyElem of body) {
+        if (bodyElem[0] === head[0] && bodyElem[1] === head[1]) {
+          return true;
+        } else {
+        }
+      }
+    }
+    return false;
+  }
+
   addKeayboardEvent() {
     window.addEventListener("keydown", (event) => {
       console.log("key", event.key);
@@ -73,27 +95,11 @@ export default class Snake {
     }
   }
 
-  gameOver() {
-    if (
-      this.snake[0][0] > 19 ||
-      this.snake[0][0] < 0 ||
-      this.snake[0][1] > 19 ||
-      this.snake[0][1] < 0
-    ) {
-      return true;
-    } else {
-      const [head, ...body] = this.snake;
+  //Gamepage
 
-      //if head colision body
-      for (let bodyElem of body) {
-        if (bodyElem[0] === head[0] && bodyElem[1] === head[1]) {
-          return true;
-        } else {
-        }
-      }
-    }
-    return false;
-  }
+  connectgamePad() {}
+
+  disconnectGamepad() {}
 
   // Draw element of game
 
