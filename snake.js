@@ -16,38 +16,11 @@ export default class Snake {
     this.score = 0;
 
     this.addKeayboardEvent(this.direction);
+
+    //Start game
     requestAnimationFrame(() => {
       this.move();
     });
-  }
-
-  drawScore() {
-    this.ctx.fillStyle = "black";
-    this.ctx.font = "40px sans-serif";
-    this.ctx.textBaseline = "top";
-    this.ctx.fillText(this.score, this.gridSize, this.gridSize);
-  }
-
-  gameOver() {
-    if (
-      this.snake[0][0] > 19 ||
-      this.snake[0][0] < 0 ||
-      this.snake[0][1] > 19 ||
-      this.snake[0][1] < 0
-    ) {
-      return true;
-    } else {
-      const [head, ...body] = this.snake;
-
-      //if head colision body
-      for (let bodyElem of body) {
-        if (bodyElem[0] === head[0] && bodyElem[1] === head[1]) {
-          return true;
-        } else {
-        }
-      }
-    }
-    return false;
   }
 
   addKeayboardEvent() {
@@ -84,21 +57,45 @@ export default class Snake {
     });
   }
 
-  generateApple() {
-    const [x, y] = [
-      Math.trunc(Math.random() * 19),
-      Math.trunc(Math.random() * 19),
-    ];
+  move() {
+    if (!this.updateSnakePosition(this.snake)) {
+      this.drawMap(this.ctx);
+      this.drawSnake(this.ctx, this.snake, this.gridSize);
+      this.drawApple(this.ctx, this.apple, this.gridSize);
+      this.drawScore();
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          this.move();
+        });
+      }, 3000 - this.speed);
+    } else {
+      alert("Game Over !");
+    }
+  }
 
-    for (let body of this.snake) {
-      if (body[0] === x && body[1] === y) {
-        return this.generateApple();
+  gameOver() {
+    if (
+      this.snake[0][0] > 19 ||
+      this.snake[0][0] < 0 ||
+      this.snake[0][1] > 19 ||
+      this.snake[0][1] < 0
+    ) {
+      return true;
+    } else {
+      const [head, ...body] = this.snake;
+
+      //if head colision body
+      for (let bodyElem of body) {
+        if (bodyElem[0] === head[0] && bodyElem[1] === head[1]) {
+          return true;
+        } else {
+        }
       }
     }
-
-    this.apple = [x, y];
-    this.score = this.score + 1;
+    return false;
   }
+
+  // Draw element of game
 
   updateSnakePosition(snake) {
     console.log("update positon", this.direction);
@@ -128,6 +125,13 @@ export default class Snake {
     return this.gameOver(snake);
   }
 
+  drawScore() {
+    this.ctx.fillStyle = "black";
+    this.ctx.font = "40px sans-serif";
+    this.ctx.textBaseline = "top";
+    this.ctx.fillText(this.score, this.gridSize, this.gridSize);
+  }
+
   drawMap(ctx) {
     ctx.fillStyle = "rgb(215,215,215)";
     ctx.fillRect(0, 0, 800, 800);
@@ -145,20 +149,20 @@ export default class Snake {
     ctx.fillRect(apple[0] * size, apple[1] * size, size, size);
   }
 
-  move() {
-    if (!this.updateSnakePosition(this.snake)) {
-      this.drawMap(this.ctx);
-      this.drawSnake(this.ctx, this.snake, this.gridSize);
-      this.drawApple(this.ctx, this.apple, this.gridSize);
-      this.drawScore();
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          this.move();
-        });
-      }, 3000 - this.speed);
-    } else {
-      alert("Game Over !");
+  generateApple() {
+    const [x, y] = [
+      Math.trunc(Math.random() * 19),
+      Math.trunc(Math.random() * 19),
+    ];
+
+    for (let body of this.snake) {
+      if (body[0] === x && body[1] === y) {
+        return this.generateApple();
+      }
     }
+
+    this.apple = [x, y];
+    this.score = this.score + 1;
   }
 }
 
