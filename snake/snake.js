@@ -1,7 +1,7 @@
 class Snake {
   constructor() {
     this.canvas = document.querySelector("canvas");
-    this.canvasSize = 600;
+    this.canvasSize = [400, 600];
     this.ctx = this.canvas.getContext("2d");
     this.snake = [
       [7, 9],
@@ -9,9 +9,9 @@ class Snake {
       [5, 9],
     ];
     this.apple = [5, 5];
-    this.gridSize = 40; // 20 * 20
+    this.gridSize = 20;
     this.direction = "e";
-    this.speed = 100;
+    this.speed = 800;
     this.score = 0;
     this.running = false;
 
@@ -32,18 +32,25 @@ class Snake {
     });
   }
 
-  coordMax() {
-    if (this.gridSize % 2 !== 0) {
-      alert("Change gridSize for a multiple of two");
+  x_coordMax() {
+    if (this.gridSize % 10 !== 0) {
+      alert("Change gridSize for a multiple of ten");
     }
-    return this.gridSize / 2 - 1;
+    return this.canvasSize[0] / this.gridSize - 1;
+  }
+
+  y_coordMax() {
+    if (this.gridSize % 10 !== 0) {
+      alert("Change gridSize for a multiple of ten");
+    }
+    return this.canvasSize[1] / this.gridSize - 1;
   }
 
   gameOver() {
     if (
-      this.snake[0][0] > this.coordMax() ||
+      this.snake[0][0] > this.x_coordMax() ||
       this.snake[0][0] < 0 ||
-      this.snake[0][1] > this.coordMax() ||
+      this.snake[0][1] > this.y_coordMax() ||
       this.snake[0][1] < 0
     ) {
       return true;
@@ -103,7 +110,7 @@ class Snake {
         requestAnimationFrame(() => {
           this.move();
         });
-      }, 500 - this.speed);
+      }, 1000 - this.speed);
     } else {
       alert("Game Over !");
     }
@@ -219,7 +226,7 @@ class Snake {
     snake.unshift(head);
     if (head[0] === this.apple[0] && head[1] === this.apple[1]) {
       this.generateApple();
-      this.speed = this.speed + 5 < 320 ? this.speed + 5 : this.speed;
+      this.speed = this.speed + 5 < 920 ? this.speed + 5 : this.speed;
     } else {
       snake.pop();
     }
@@ -228,12 +235,14 @@ class Snake {
 
   drawScore() {
     this.ctx.fillStyle = "black";
-    this.ctx.font = "40px sans-serif";
+    this.ctx.font = "32px sans-serif";
     this.ctx.textBaseline = "top";
     this.ctx.fillText(this.score, this.gridSize, this.gridSize);
   }
 
   drawMap(ctx) {
+    this.canvas.width = this.canvasSize[0];
+    this.canvas.height = this.canvasSize[1];
     ctx.fillStyle = "rgb(215,215,215)";
     ctx.fillRect(0, 0, 800, 800);
   }
@@ -253,8 +262,8 @@ class Snake {
 
   generateApple() {
     const [x, y] = [
-      Math.trunc(Math.random() * this.coordMax()),
-      Math.trunc(Math.random() * this.coordMax()),
+      Math.trunc(Math.random() * this.x_coordMax()),
+      Math.trunc(Math.random() * this.y_coordMax()),
     ];
 
     for (let body of this.snake) {
