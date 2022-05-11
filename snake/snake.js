@@ -63,7 +63,6 @@ class Snake {
 
   addKeayboardEvent() {
     window.addEventListener("keydown", (event) => {
-      console.log("key", event.key);
       switch (event.key) {
         case "ArrowRight": {
           if (this.direction !== "o") {
@@ -73,13 +72,11 @@ class Snake {
         }
         case "ArrowLeft": {
           if (this.direction !== "e") {
-            console.log(this.direction);
             this.direction = "o";
           }
           break;
         }
         case "ArrowUp": {
-          console.log("???");
           if (this.direction !== "s") {
             this.direction = "n";
           }
@@ -96,6 +93,7 @@ class Snake {
   }
 
   move() {
+    console.log(this.speed);
     if (!this.updateSnakePosition(this.snake)) {
       this.drawMap(this.ctx);
       this.drawSnake(this.ctx, this.snake, this.gridSize);
@@ -204,7 +202,6 @@ class Snake {
   // Draw element of game
 
   updateSnakePosition(snake) {
-    console.log("update positon", this.direction);
     let head;
     switch (this.direction) {
       case "e":
