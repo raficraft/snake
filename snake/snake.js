@@ -249,7 +249,7 @@ class Snake {
 
   drawApple(ctx, apple, size) {
     const img = new Image();
-    img.src = "./snake/pomme.png";
+    img.src = "./assets/pomme.png";
     ctx.drawImage(img, apple[0] * size, apple[1] * size, size, size);
   }
 
