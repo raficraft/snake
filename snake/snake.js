@@ -156,7 +156,6 @@ class Snake {
   }
 
   gamePadUpdate() {
-    const textDisplay = document.querySelector(".returnInput");
     this.gamepads = navigator.getGamepads()[0];
     if (this.gamepads) {
       this.gamepadState = {
@@ -193,7 +192,6 @@ class Snake {
       this.addGamePadEvent();
     }
 
-    textDisplay.textContent = JSON.stringify(this.gamepadState, null, 2);
     requestAnimationFrame(() => {
       this.gamePadUpdate();
     });
