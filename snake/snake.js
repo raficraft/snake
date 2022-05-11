@@ -1,8 +1,7 @@
-export default class Snake {
+class Snake {
   constructor() {
-    console.log("YOLOs");
-
     this.canvas = document.querySelector("canvas");
+    this.canvasSize = 600;
     this.ctx = this.canvas.getContext("2d");
     this.snake = [
       [7, 9],
@@ -14,6 +13,8 @@ export default class Snake {
     this.direction = "e";
     this.speed = 100;
     this.score = 0;
+    this.running = false;
+
     this.gamepads = false;
     this.gamepadState = {};
 
@@ -21,17 +22,28 @@ export default class Snake {
     this.connectgamePad();
     this.disconnectGamepad();
 
+    requestAnimationFrame(() => {
+      this.gamePadUpdate();
+    });
+
     //Start game
     requestAnimationFrame(() => {
       this.move();
     });
   }
 
+  coordMax() {
+    if (this.gridSize % 2 !== 0) {
+      alert("Change gridSize for a multiple of two");
+    }
+    return this.gridSize / 2 - 1;
+  }
+
   gameOver() {
     if (
-      this.snake[0][0] > 19 ||
+      this.snake[0][0] > this.coordMax() ||
       this.snake[0][0] < 0 ||
-      this.snake[0][1] > 19 ||
+      this.snake[0][1] > this.coordMax() ||
       this.snake[0][1] < 0
     ) {
       return true;
@@ -84,27 +96,54 @@ export default class Snake {
   }
 
   move() {
-    this.gamePadUpdate();
-    requestAnimationFrame(() => {
-      this.move();
-    });
-
-    // if (!this.updateSnakePosition(this.snake)) {
-    //   this.drawMap(this.ctx);
-    //   this.drawSnake(this.ctx, this.snake, this.gridSize);
-    //   this.drawApple(this.ctx, this.apple, this.gridSize);
-    //   this.drawScore();
-    //   setTimeout(() => {
-    //     requestAnimationFrame(() => {
-    //       this.move();
-    //     });
-    //   }, 500 - this.speed);
-    // } else {
-    //   alert("Game Over !");
-    // }
+    if (!this.updateSnakePosition(this.snake)) {
+      this.drawMap(this.ctx);
+      this.drawSnake(this.ctx, this.snake, this.gridSize);
+      this.drawApple(this.ctx, this.apple, this.gridSize);
+      this.drawScore();
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          this.move();
+        });
+      }, 500 - this.speed);
+    } else {
+      alert("Game Over !");
+    }
   }
 
-  //Gamepage
+  //Gamepad
+
+  addGamePadEvent() {
+    if (this.gamepads) {
+      if (this.gamepadState.cross.right) {
+        if (this.direction !== "o") {
+          this.direction = "e";
+        }
+        return;
+      }
+
+      if (this.gamepadState.cross.left) {
+        if (this.direction !== "e") {
+          this.direction = "o";
+        }
+        return;
+      }
+
+      if (this.gamepadState.cross.down) {
+        if (this.direction !== "n") {
+          this.direction = "s";
+        }
+        return;
+      }
+
+      if (this.gamepadState.cross.up) {
+        if (this.direction !== "s") {
+          this.direction = "n";
+        }
+        return;
+      }
+    }
+  }
 
   connectgamePad() {
     window.addEventListener("gamepadconnected", (event) => {
@@ -120,38 +159,46 @@ export default class Snake {
 
   gamePadUpdate() {
     const textDisplay = document.querySelector(".returnInput");
-    const gamepads = navigator.getGamepads()[0];
-    if (gamepads) {
-      console.log(gamepads.buttons[0].pressed);
-
+    this.gamepads = navigator.getGamepads()[0];
+    if (this.gamepads) {
       this.gamepadState = {
-        id: gamepads.id,
-        stick_left: [gamepads.axes[2].toFixed(2), gamepads.axes[3].toFixed(2)],
-        stick_right: [gamepads.axes[0].toFixed(2), gamepads.axes[1].toFixed(2)],
+        id: this.gamepads.id,
+        stick_left: [
+          this.gamepads.axes[0].toFixed(2),
+          this.gamepads.axes[1].toFixed(2),
+        ],
+        stick_right: [
+          this.gamepads.axes[2].toFixed(2),
+          this.gamepads.axes[3].toFixed(2),
+        ],
         button: {
-          A: gamepads.buttons[0].pressed,
-          B: gamepads.buttons[1].pressed,
-          X: gamepads.buttons[2].pressed,
-          Y: gamepads.buttons[3].pressed,
-          L: gamepads.buttons[4].pressed,
-          R: gamepads.buttons[5].pressed,
-          ZL: gamepads.buttons[6].pressed,
-          ZR: gamepads.buttons[7].pressed,
-          start: gamepads.buttons[9].pressed,
-          stick_1: gamepads.buttons[10].pressed,
-          stick_2: gamepads.buttons[11].pressed,
+          A: this.gamepads.buttons[0].pressed,
+          B: this.gamepads.buttons[1].pressed,
+          X: this.gamepads.buttons[2].pressed,
+          Y: this.gamepads.buttons[3].pressed,
+          L: this.gamepads.buttons[4].pressed,
+          R: this.gamepads.buttons[5].pressed,
+          ZL: this.gamepads.buttons[6].pressed,
+          ZR: this.gamepads.buttons[7].pressed,
+          start: this.gamepads.buttons[9].pressed,
+          stick_1: this.gamepads.buttons[10].pressed,
+          stick_2: this.gamepads.buttons[11].pressed,
         },
 
         cross: {
-          up: gamepads.buttons[12].pressed,
-          down: gamepads.buttons[13].pressed,
-          left: gamepads.buttons[14].pressed,
-          right: gamepads.buttons[15].pressed,
+          up: this.gamepads.buttons[12].pressed,
+          down: this.gamepads.buttons[13].pressed,
+          left: this.gamepads.buttons[14].pressed,
+          right: this.gamepads.buttons[15].pressed,
         },
       };
+      this.addGamePadEvent();
     }
 
     textDisplay.textContent = JSON.stringify(this.gamepadState, null, 2);
+    requestAnimationFrame(() => {
+      this.gamePadUpdate();
+    });
   }
 
   // Draw element of game
@@ -177,7 +224,7 @@ export default class Snake {
     snake.unshift(head);
     if (head[0] === this.apple[0] && head[1] === this.apple[1]) {
       this.generateApple();
-      this.speed = this.speed + 5 < 720 ? this.speed + 5 : this.speed;
+      this.speed = this.speed + 5 < 320 ? this.speed + 5 : this.speed;
     } else {
       snake.pop();
     }
@@ -199,19 +246,22 @@ export default class Snake {
   drawSnake(ctx, snake, size) {
     ctx.fillStyle = "#7fca1d";
     for (let body of snake) {
-      ctx.fillRect(body[0] * size, body[1] * size, size, size);
+      ctx.fillRect(body[0] * size, body[1] * size, size - 2, size - 2);
     }
   }
 
   drawApple(ctx, apple, size) {
-    ctx.fillStyle = "#fc5837";
-    ctx.fillRect(apple[0] * size, apple[1] * size, size, size);
+    // ctx.fillStyle = "#fc5837";
+    // ctx.fillRect(apple[0] * size, apple[1] * size, size, size);
+    const img = new Image();
+    img.src = "./snake/pomme.png";
+    ctx.drawImage(img, apple[0] * size, apple[1] * size, size, size);
   }
 
   generateApple() {
     const [x, y] = [
-      Math.trunc(Math.random() * 19),
-      Math.trunc(Math.random() * 19),
+      Math.trunc(Math.random() * this.coordMax()),
+      Math.trunc(Math.random() * this.coordMax()),
     ];
 
     for (let body of this.snake) {
