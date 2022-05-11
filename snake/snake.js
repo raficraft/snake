@@ -251,8 +251,6 @@ class Snake {
   }
 
   drawApple(ctx, apple, size) {
-    // ctx.fillStyle = "#fc5837";
-    // ctx.fillRect(apple[0] * size, apple[1] * size, size, size);
     const img = new Image();
     img.src = "./snake/pomme.png";
     ctx.drawImage(img, apple[0] * size, apple[1] * size, size, size);
