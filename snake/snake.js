@@ -30,7 +30,13 @@ class Snake {
     requestAnimationFrame(() => {
       this.move();
     });
+
+    window.addEventListener("resize", () => {
+      resizeGame();
+    });
   }
+
+  resizeGame() {}
 
   x_coordMax() {
     if (this.gridSize % 10 !== 0) {
@@ -47,25 +53,24 @@ class Snake {
   }
 
   gameOver() {
-    if (
-      this.snake[0][0] > this.x_coordMax() ||
-      this.snake[0][0] < 0 ||
-      this.snake[0][1] > this.y_coordMax() ||
-      this.snake[0][1] < 0
-    ) {
-      return true;
-    } else {
-      const [head, ...body] = this.snake;
+    // if (
+    //   this.snake[0][0] > this.x_coordMax() ||
+    //   this.snake[0][0] < 0 ||
+    //   this.snake[0][1] > this.y_coordMax() ||
+    //   this.snake[0][1] < 0
+    // ) {
+    //   return true;
+    // } else {
+    const [head, ...body] = this.snake;
 
-      //if head colision body
-      for (let bodyElem of body) {
-        if (bodyElem[0] === head[0] && bodyElem[1] === head[1]) {
-          return true;
-        } else {
-        }
+    //if head colision body
+    for (let bodyElem of body) {
+      if (bodyElem[0] === head[0] && bodyElem[1] === head[1]) {
+        return true;
       }
     }
-    return false;
+    // }
+    // return false;
   }
 
   addKeayboardEvent() {
@@ -210,20 +215,36 @@ class Snake {
     let head;
     switch (this.direction) {
       case "e":
-        head = [snake[0][0] + 1, snake[0][1]];
+        head = [
+          snake[0][0] + 1 > this.x_coordMax() ? 0 : snake[0][0] + 1,
+          snake[0][1],
+        ];
         break;
       case "o":
-        head = [snake[0][0] - 1, snake[0][1]];
+        head = [
+          snake[0][0] - 1 < 0 ? this.x_coordMax() : snake[0][0] - 1,
+          snake[0][1],
+        ];
         break;
-      case "s":
-        head = [snake[0][0], snake[0][1] + 1];
-        break;
+
       case "n":
-        head = [snake[0][0], snake[0][1] - 1];
+        head = [
+          snake[0][0],
+          snake[0][1] - 1 < 0 ? this.y_coordMax() : snake[0][1] - 1,
+        ];
+        break;
+
+      case "s":
+        head = [
+          snake[0][0],
+          snake[0][1] + 1 > this.y_coordMax() ? 0 : snake[0][1] + 1,
+        ];
         break;
     }
 
     snake.unshift(head);
+
+    //if snake eat apple
     if (head[0] === this.apple[0] && head[1] === this.apple[1]) {
       this.generateApple();
       this.speed = this.speed + 5 < 920 ? this.speed + 5 : this.speed;
